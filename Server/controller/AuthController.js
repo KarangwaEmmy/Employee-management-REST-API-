@@ -1,12 +1,12 @@
 import Bcrypt from '../Helper/hash';
 import jwt from 'jsonwebtoken';
-import ValidateHelp from '../Middleware/AuthValidations';
+import ValidateHelp from '../Middleware/Validation';
 import EmpModel from '../model/DBModel';
-import Mailer from '../Helper/Mailer'
+//import Mailer from '../Helper/Mailer'
 
 class Users {
     async SignupEmployee( req, res) {
-        const {  email, nationalId, phoneNumber, dateofBirth, password, createdDate, nodifiedDate} = req.body;
+        const {  name, email, nationalId, phoneNumber, dateofBirth, password} = req.body;
         const createValidate = ValidateHelp.schemaCreate(req.body);
         if(createValidate.error){
           const Message = createValidate.error.details[0].message;
@@ -16,26 +16,41 @@ class Users {
             message: messUser
           });
         } if(!createValidate.error){
+      // Check existence of email 
+      const findThisUser = await EmpModel.checkEmaiExist(email);
+      if (findThisUser.length > 0)
+       { res.status(401).json({ status: 401, message: 'email Already exists. Try another email' }); }
+         // Check existence of  national Id 
+      const foundId = await EmpModel.checkNationalIdExist(nationalId);
+      if (foundId.length > 0)
+       { res.status(401).json({ status: 401, message: 'National ID Already exists. Check if youo have written correct ID' }); }
+         // Check existence of phone Number
+      const foundPhone = await EmpModel.checkPhoneExist(phoneNumber);
+      if (foundPhone.length > 0)
+       { res.status(401).json({ status: 401, message: 'phone Number Already exists. check if  phone number is correct' }); } 
+       
+          const hashed = Bcrypt.hashpassword(password)
           const EmpData = {
             position: 'manager',
-            email: email,
+            name: name,
             nationalId: nationalId,
             phoneNumber: phoneNumber,
             email: email,
+            hashed,
             dateofBirth: dateofBirth,
             status: 'inactive',
             createdDate: new Date(),
             modifiedDate: 'none'
-          }
-          const hashed = Bcrypt.hashpassword(password)
-           const newEmployee = await EmpModel.createRecord(EmpData);
+          }    
+
+          const newEmployee = await EmpModel.createEmployee(EmpData);
           const data = await EmpModel.fetchOneRecord(newEmployee[0].id);
           res.status(201).json({ status: 201, message: ` Employee was created successfully on ${ValidateHelp.ceatedOn}`, data: data});
-          await Mailer.sendMail(newEmployee);
+          //await Mailer.sendMail(newEmployee);
         }
       }
 
-  async loginUser(req, res) {
+  async LoginEMployee(req, res) {
     const { email, password } = req.body;
     const inValidate = ValidateHelp.schemaSignIn(req.body);
     if (inValidate.error) {
@@ -45,25 +60,20 @@ class Users {
     }
     if (!inValidate.error) {
       const findThisUser = await EmpModel.checkEmaiExist(email);
-      if (findThisUser.length === 0) { res.status(401).json({ status: 401, message: 'wrong Credentials' }); } else {
-        Bcrypt.comparepassword(password, findThisUser[0].password, (err, result) => {
-          if (result) {
+      if (findThisUser.length === 0)
+       { res.status(401).json({ status: 401, message: 'wrong Credentials email' }); }
+       const comparredPassword = Bcrypt.comparepassword(password, findThisUser[0].password); 
+          if (comparredPassword) {
             const tokens = jwt.sign(findThisUser[0], process.env.SECRET_KEY, { expiresIn: '24000h' });
-            res.status(200).json({ status: 200, message: `${findThisUser[0].email} your logged in successfully on ${Validator.created}`, token: tokens });
+            res.status(200).json({ status: 200, message: `${findThisUser[0].name} your logged in successfully on ${ValidateHelp.ceatedOn}`, token: tokens });
           } else {
-            res.status(401).json({ status: 401, message: `${findThisUser[0].email} You are using wrong Credentials Password` });
+            res.status(401).json({ status: 401, message: `${findThisUser[0].name} You are using wrong Credentials Password` });
           }
-        });
-      }
-    }
+        };
+       
   }
 
-  async getUsers(req, res) {
-    const ckEmailOnGetUsers = await EmpModel.checkEmaiExist(req.attachedWithInfo.email);
-    if (ckEmailOnGetUsers.length === 0) return res.status(400).json({ status: 400, message: 'Invalid token' });
-    const users = await EmpModel.fetchAllUser();
-    return res.status(200).json({ status: 200, message: ` ${req.attachedWithInfo.email} users retrieved Successfully `, data: users });
-  }
+
 }
 const expUsers = new Users();
 export default expUsers;

@@ -1,11 +1,10 @@
 
 import { Router } from 'express';
-
-import ExportEmployee from '../controller/AuthController';
+import ImportEmployee from '../controller/AuthController';
 
 
 const router = Router();
-router.post('/signup', ExportEmployee.SignupEmployee);
-router.post('/login', ExportEmployee.loginUser);
+router.post('/signup',  ImportEmployee.SignupEmployee);
+router.post('/login', ImportEmployee.LoginEMployee);
 
 export default router;

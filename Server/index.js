@@ -21,7 +21,7 @@ app.get('/', (req, res) => res.send({
 app.use('/api/auth', AuthRoute);
 app.use('/api', EmployeeRoute);
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 6000;
 
 // eslint-disable-next-line no-console
 const server = app.listen(port, console.log(`Employee management App is running on port ${port}`));

@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import EmpModel from '../model/DBModel'
 
 class EmployeeValidate{
 
@@ -9,10 +10,11 @@ class EmployeeValidate{
   schemaCreate(dataToValidate) {
 
     const empSchema = {
-      position : Joi.string().required(),
+      position : Joi.string(),
       name: Joi.string().required().min(3).max(20),
       nationalId: Joi.number().min(16).required(),
       email: Joi.string().required(),
+      password: Joi.string().min(6),
       phoneNumber: Joi.number().min(10).required(),
       dateofBirth: Joi.string(),
       status: Joi.string().required()
@@ -26,7 +28,13 @@ class EmployeeValidate{
       return status;
     }
   }
-
+  schemaSignIn(dataToValidate) {
+    const inSchema = {
+      email: Joi.string().email().required(),
+      password: Joi.string().min(6),
+    };
+    return Joi.validate(dataToValidate, inSchema);
+  }
 
 }
 const ValidateHelp = new EmployeeValidate();
