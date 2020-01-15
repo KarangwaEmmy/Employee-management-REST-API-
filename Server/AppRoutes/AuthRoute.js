@@ -5,6 +5,6 @@ import ImportEmployee from '../controller/AuthController';
 
 const router = Router();
 router.post('/signup',  ImportEmployee.SignupEmployee);
-router.post('/login', ImportEmployee.LoginEMployee);
+router.post('/signin', ImportEmployee.LoginEMployee);
 
 export default router;

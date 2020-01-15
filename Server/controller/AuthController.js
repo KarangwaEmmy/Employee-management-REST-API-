@@ -16,6 +16,8 @@ class Users {
             message: messUser
           });
         } if(!createValidate.error){
+          try{
+
       // Check existence of email 
       const findThisUser = await EmpModel.checkEmaiExist(email);
       if (findThisUser.length > 0)
@@ -47,6 +49,9 @@ class Users {
           const data = await EmpModel.fetchOneRecord(newEmployee[0].id);
           res.status(201).json({ status: 201, message: ` Employee was created successfully on ${ValidateHelp.ceatedOn}`, data: data});
           //await Mailer.sendMail(newEmployee);
+        }catch(error){
+          res.status(500).json({ status: 500, error: 'Internal Server Error!' });
+        }
         }
       }
 
@@ -59,6 +64,8 @@ class Users {
       res.status(400).send({ status: 400, message: messUser });
     }
     if (!inValidate.error) {
+      try {
+
       const findThisUser = await EmpModel.checkEmaiExist(email);
       if (findThisUser.length === 0)
        { res.status(401).json({ status: 401, message: 'wrong Credentials email' }); }
@@ -69,6 +76,9 @@ class Users {
           } else {
             res.status(401).json({ status: 401, message: `${findThisUser[0].name} You are using wrong Credentials Password` });
           }
+        }catch(error){
+          res.status(500).json({ status: 500, error: 'Internal Server Error!' });
+        }
         };
        
   }

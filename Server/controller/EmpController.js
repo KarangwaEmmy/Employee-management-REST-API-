@@ -15,6 +15,20 @@ async createEmployee( req, res) {
       message: messUser
     });
   } if(!createValidate.error){
+    // Check existence of email 
+    const findThisUser = await EmpModel.checkEmaiExist(email);
+    if (findThisUser.length > 0)
+      { res.status(401).json({ status: 401, message: 'email Already exists. Try another email' }); }
+        // Check existence of  national Id 
+    const foundId = await EmpModel.checkNationalIdExist(nationalId);
+    if (foundId.length > 0)
+      { res.status(401).json({ status: 401, message: 'National ID Already exists. Check if youo have written correct ID' }); }
+        // Check existence of phone Number
+    const foundPhone = await EmpModel.checkPhoneExist(phoneNumber);
+    if (foundPhone.length > 0)
+      { res.status(401).json({ status: 401, message: 'phone Number Already exists. check if  phone number is correct' }); } 
+
+   try{
     const EmpData = {
       position: position,
       name: name,
@@ -30,6 +44,9 @@ async createEmployee( req, res) {
     const data = await EmpModel.fetchOneRecord(newEmployee[0].id);
     res.status(201).json({ status: 201, message: ` Employee was registered successfully on ${ValidateHelp.ceatedOn}`, data: data});
     await Mailer.sendMail(newEmployee);
+   }catch(error){
+    res.status(500).json({ status: 500, error: 'Internal Server Error!' });
+   }
   }
 }
 async fetchAllEmployees(req, res) {
@@ -40,16 +57,38 @@ async fetchAllEmployees(req, res) {
 
 async destroyRecord(req, res) {
   const getData = await EmpModel.fetchOneRecord((parseInt(req.params.id)));
-  if (!(parseInt(req.params.id))) {
-    return res.status(404).json({ status: 404, message: `Hey insert record id ` });
+  try{
+    if (!(parseInt(req.params.id))) {
+      return res.status(404).json({ status: 404, message: `Hey insert record id ` });
+    }
+    if (getData.length === 0) {
+      return res.status(404).json({ status: 404, message: `Hey this record with id ${(parseInt(req.params.id))} is not found ` });
+    }
+    await EmpModel.deleteRecord((parseInt(req.params.id)));
+    return res.status(200).json({ status: 200, message: `Hey !! this record with id ${(parseInt(req.params.id))} was deleted Successfully ` });
+  
+  }catch(error){
+    res.status(500).json({ status: 500, error: 'Internal Server Error!' });
   }
-  if (getData.length === 0) {
-    return res.status(404).json({ status: 404, message: `Hey this record with id ${(parseInt(req.params.id))} is not found ` });
-  }
-  await EmpModel.deleteRecord((parseInt(req.params.id)));
-  return res.status(200).json({ status: 200, message: `Hey !! this record with id ${(parseInt(req.params.id))} was deleted Successfully ` });
+ 
 }
-
+async FetchoneEmployee(req, res) {
+  const getData = await EmpModel.fetchOneRecord((parseInt(req.params.id)));
+  try{
+    if (!(parseInt(req.params.id))) {
+      return res.status(404).json({ status: 404, message: `Hey insert record id ` });
+    }
+    if (getData.length === 0) {
+      return res.status(404).json({ status: 404, message: `Hey this record with id ${(parseInt(req.params.id))} is not found ` });
+    }
+    await EmpModel.fetchOneUser((parseInt(req.params.id)));
+    return res.status(200).json({ status: 200, message: `Hey !! this record with id ${(parseInt(req.params.id))} was fetched Successfully `, data:  getData});
+  
+  }catch(error){
+    res.status(500).json({ status: 500, error: 'Internal Server Error!' });
+  }
+ 
+}
 async activateEmployee(req, res) {
   const { position, name, nationalId, email, phoneNumber, dateofBirth, status} = req.body;
   const fetchData = await EmpModel.fetchOneRecord((parseInt(req.params.id)));
@@ -59,7 +98,7 @@ async activateEmployee(req, res) {
   if (fetchData.length === 0) {
     return res.status(404).json({ status: 404, message: `Hey this employee with id ${(parseInt(req.params.id))} is not found in the database` });
   }
-
+  try{
   const readyDatas = {
     position: position || '',
     name: name || fetchData[0].name,
@@ -69,12 +108,14 @@ async activateEmployee(req, res) {
     dateofBirth: dateofBirth || fetchData[0].dateofBirth,
     status: 'activated',
     modifiedDate: new Date(),
-    
-
   };
 
   const updateRecord = await EmpModel.editStatus(readyDatas, parseInt(req.params.id));
-  return res.status(200).json({ status: 200, message: `Hey !!  Employee with id ${(parseInt(req.params.id))} was activated Successfully  on ${ValidateHelp.ceatedOn}`, data: updateRecord });
+  return res.status(200).json({ status: 200, message: `Hey !!  Employee named id ${(parseInt(req.params.id))} was activated Successfully  on ${ValidateHelp.ceatedOn}`, data: updateRecord });
+}
+catch(error){
+  res.status(500).json({ status: 500, error: 'Internal Server Error!' });
+}
 }
 
 async suspendEmployee(req, res) {
@@ -86,7 +127,7 @@ async suspendEmployee(req, res) {
   if (fetchData.length === 0) {
     return res.status(404).json({ status: 404, message: `Hey this record with id ${(parseInt(req.params.id))} is not found ` });
   }
-
+try {
   const readyDatas = {
 
     position: position || fetchData[0].position,
@@ -102,6 +143,9 @@ async suspendEmployee(req, res) {
 
   const updateRecord = await EmpModel.editStatus(readyDatas, parseInt(req.params.id));
   return res.status(200).json({ status: 200, message: `Hey !! Employee  with id ${(parseInt(req.params.id))} was suspended Successfully  on ${ValidateHelp.ceatedOn}`, data: updateRecord });
+}catch(error){
+  res.status(500).json({ status: 500, error: 'Internal Server Error!' });
+}
 }
 
 async updateEmployee(req, res) {
@@ -113,7 +157,7 @@ async updateEmployee(req, res) {
   if (fetchData.length === 0) {
     return res.status(404).json({ status: 404, message: `Hey this record with id ${(parseInt(req.params.id))} is not found ` });
   }
-
+ try{
   const readyDatas = {
     id: req.params.id,
     position: position || fetchData[0].position,
@@ -128,33 +172,25 @@ async updateEmployee(req, res) {
 
   const updateRecord = await EmpModel.updateEmployee(readyDatas, parseInt(req.params.id));
   return res.status(200).json({ status: 200, message: `Hey !! Your record with id ${(parseInt(req.params.id))} was updated Successfully  on ${ValidateHelp.ceatedOn}`, data: updateRecord });
+}catch(error){
+  res.status(500).json({ status: 500, error: 'Internal Server Error!' });
+}
 }
 // Search features
-
-async SeachByName(req, res) {
-  const fetchData = await EmpModel.searchName((req.params.name));
-  if (!(parseInt(req.params.id))) {
-    return res.status(404).json({ status: 404, message: `Hey new employee record id ` });
-  }
-  if (fetchData.length === 0) {
-    return res.status(404).json({ status: 404, message: `Hey this employee with id ${(req.params.name)} is not found ` });
-  }
-
-  const updateRecord = await EmpModel.searchName(readyDatas, req.params.name);
-  return res.status(200).json({ status: 200, message: `Hey !! Your record with id ${(req.params.name)} was searched Successfully  on ${ValidateHelp.ceatedOn}`, data: updateRecord });
-}
 
 async SeachByItem(req, res) {
   const {item} = req.body;
   const fetchData = await EmpModel.searchItem(item);
-
+    try{
 
   if (fetchData.length === 0) {
     return res.status(404).json({ status: 404, message: `Your search: ${(item)} is not found ` });
   }
 
-  // const searchEmployee = await fetchData.filter(item.position === req.body.position);
   return res.status(200).json({ status: 200, message: `Hey !!  Employee with  ${(item)} was searched Successfully  on ${ValidateHelp.ceatedOn}`, data: fetchData });
+}catch(error){
+  res.status(500).json({ status: 500, error: 'Internal Server Error!' });
+}
 }
 }
 

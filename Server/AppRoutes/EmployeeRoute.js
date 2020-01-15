@@ -7,6 +7,7 @@ import ExportEmployee from '../controller/EmpController';
 const router = Router();
 router.post('/employee', ExportEmployee.createEmployee);
 router.get('/employee', ExportEmployee.fetchAllEmployees);
+router.get('/employee/:id', ExportEmployee.FetchoneEmployee);
 router.delete('/employee/:id', ExportEmployee.destroyRecord);
 router.patch('/employee/:id', ExportEmployee.updateEmployee);
 router.patch('/employee/:id/activate', ExportEmployee.activateEmployee);
