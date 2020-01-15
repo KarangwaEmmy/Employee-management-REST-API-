@@ -12,8 +12,7 @@ router.patch('/employee/:id', ExportEmployee.updateEmployee);
 router.patch('/employee/:id/activate', ExportEmployee.activateEmployee);
 router.patch('/employee/:id/suspend', ExportEmployee.suspendEmployee);
 
-// search routes
-// router.get('/employee/search/:name', ExportEmployee.SeachByName);
-// router.get('/employee/search/:position', ExportEmployee.SeachByPosition);
+// search route
 router.post('/employees/search', ExportEmployee.SeachByItem);
+
 export default router;

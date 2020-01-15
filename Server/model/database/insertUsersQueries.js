@@ -1,7 +1,10 @@
-const user = `INSERT INTO userdb( category, firstname, lastname, username, email, phoneNumber, password, createdDate, modifiedDate ) 
-               VALUES( 'admin', 'minani', 'joshua', 'key-joshua', 'k.joshua855@gmail.com', '+250789619442', '$2a$12$3T3wDmPeNBaZe9uFfm23zeguUOoRwWzp5n1E7.rTZsVqZuipK7Som', '2019-11-04T16:02:22.315Z',' none' );`;
 
-const user1 = `INSERT INTO userdb( category, firstname, lastname, username, email, phoneNumber, password, createdDate, modifiedDate ) 
-               VALUES( 'user', 'moriah', 'jessica', 'Jessy', 'jessy@gmail.com', '+250780000000', '$2a$12$2ITV7msFVWz73xHTYIapb.rqsMWw5HaINzwnIocGCp2K/o.rnn4/O', '2019-11-04T14:51:24.283Z',' none' );`;
+const user = `INSERT INTO Employee( position, name, nationalId, phoneNumber, email, password, dateofBirth, status,  createdDate, modifiedDate ) 
+VALUES( 'Manager', 'Emmy Karangwa', '1199380063392105', '0786639530', 'karangwae10@gmail.com', 'Rwanda@123','15-Aug-1994', 'active', ' 2019-06-24T05:56:03.315Z', ' none' );`;
 
-export default { user, user1 };
+const user1 = `INSERT INTO Employee( position, name, nationalId, phoneNumber, email, password, dateofBirth, status,  createdDate, modifiedDate ) 
+VALUES('Developer', 'Emily Mutaga', '1199380063392105', '0786639530', 'mutagaemily@gmail.com', 'mutaga@123', '15-Aug-1994', 'active',  ' 2019-06-24T05:56:03.315Z', ' none' );`;
+
+ 
+
+export default { user, user1};
