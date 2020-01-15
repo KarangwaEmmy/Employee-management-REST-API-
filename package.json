@@ -1,0 +1,59 @@
+{
+  "name": "broadcaster",
+  "version": "1.0.0",
+  "description": "broadcaster API",
+  "main": "index.js",
+  "scripts": {
+    "createTable": "node --require @babel/polyfill --require @babel/register Server/model/database/createTableQueries",
+    "dropTable": "node --require @babel/polyfill --require @babel/register Server/model/database/dropTableQueries",
+    "dev": "nodemon --exec babel-node Server/index.js",
+    "start": " npm run dropTable && npm run createTable && babel-node --experimental-worker Server/index.js",
+    "build": "rm -rf ./build && babel -d ./build ./server -s",
+    "clean": "rm -rf build && mkdir build",
+    "testing": "nyc mocha --require @babel/polyfill --require @babel/register Server/test/*.js* --recursive --exit",
+    "test": "npm-run-series dropTable createTable testing",
+    "lint": "eslint .",
+    "local_test": "nyc --reporter=html --reporter=text mocha Server/test/*.js* --require @babel/register --exit",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KarangwaEmmy/Employee-management-REST-API-.git"
+  },
+  "author": "Emmy Karangwa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KarangwaEmmy/Employee-management-REST-API-/issues"
+  },
+  "homepage": "https://github.com/KarangwaEmmy/Employee-management-REST-API-#readme",
+  "dependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
+    "@babel/node": "^7.7.4",
+    "@babel/plugin-transform-runtime": "^7.7.4",
+    "@babel/polyfill": "^7.7.0",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/register": "^7.7.4",
+    "@babel/runtime": "^7.7.4",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "joi": "^14.3.1",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
+    "multer": "^1.4.2",
+    "nodemailer": "^6.4.2",
+    "npm-run-series": "^1.0.1",
+    "pg": "^7.14.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "babel-watch": "^7.0.0",
+    "coveralls": "^3.0.6",
+    "eslint": "^6.7.2",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "nodemon": "^1.19.2"
+  }
+}
