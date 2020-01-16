@@ -2,9 +2,9 @@ import Bcrypt from '../Helper/hash';
 import jwt from 'jsonwebtoken';
 import ValidateHelp from '../Middleware/Validation';
 import EmpModel from '../model/DBModel';
-//import Mailer from '../Helper/Mailer'
+import Mailer from '../Helper/Mailer'
 
-class Users {
+class Employees {
     async SignupEmployee( req, res) {
         const {  name, email, nationalId, phoneNumber, dateofBirth, password} = req.body;
         const createValidate = ValidateHelp.schemaCreate(req.body);
@@ -19,17 +19,17 @@ class Users {
           try{
 
       // Check existence of email 
-      const findThisUser = await EmpModel.checkEmaiExist(email);
-      if (findThisUser.length > 0)
-       { res.status(401).json({ status: 401, message: 'email Already exists. Try another email' }); }
-         // Check existence of  national Id 
-      const foundId = await EmpModel.checkNationalIdExist(nationalId);
-      if (foundId.length > 0)
-       { res.status(401).json({ status: 401, message: 'National ID Already exists. Check if youo have written correct ID' }); }
-         // Check existence of phone Number
-      const foundPhone = await EmpModel.checkPhoneExist(phoneNumber);
-      if (foundPhone.length > 0)
-       { res.status(401).json({ status: 401, message: 'phone Number Already exists. check if  phone number is correct' }); } 
+      // const findThisUser = await EmpModel.checkEmaiExist(email);
+      // if (findThisUser.length > 0)
+      //  { res.status(401).json({ status: 401, message: 'email Already exists. Try another email' }); }
+      //    // Check existence of  national Id 
+      // const foundId = await EmpModel.checkNationalIdExist(nationalId);
+      // if (foundId.length > 0)
+      //  { res.status(401).json({ status: 401, message: 'National ID Already exists. Check if youo have written correct ID' }); }
+      //    // Check existence of phone Number
+      // const foundPhone = await EmpModel.checkPhoneExist(phoneNumber);
+      // if (foundPhone.length > 0)
+      //  { res.status(401).json({ status: 401, message: 'phone Number Already exists. check if  phone number is correct' }); } 
        
           const hashed = Bcrypt.hashpassword(password)
           const EmpData = {
@@ -47,8 +47,37 @@ class Users {
 
           const newEmployee = await EmpModel.createEmployee(EmpData);
           const data = await EmpModel.fetchOneRecord(newEmployee[0].id);
-          res.status(201).json({ status: 201, message: ` Employee was created successfully on ${ValidateHelp.ceatedOn}`, data: data});
-          //await Mailer.sendMail(newEmployee);
+          res.status(201).json({ status: 201, message: ` Employee was created successfully on ${ValidateHelp.ceatedOn}`, 
+          data: {name, email, nationalId, phoneNumber, status: newEmployee.status, createdDate: newEmployee.createdDate}});
+
+          const transporter = nodemailer.createTransport(
+            {
+              service: 'gmail',
+              auth: {
+                user: process.env.USER_ACC,
+                pass: process.env.USER_PASS,
+              },
+              logger: false,
+              debug: false,
+            },
+            {
+              from: 'karangwa Emmy <karangwae10@gmail.com>',
+            },
+          );
+      
+          const messageObj = {
+            to: `<${email}>`,
+            subject: 'Registration was done successfully',
+            text: `Hello ${name}`,
+            html: `<p><b>Hello</b> ${name}</p>
+                  <p><b>Your have registered successfully please confirm to access your account</b></p>
+                  <button style =" background-color: green"> confirm </button>
+                  `
+          };
+      
+          // await transporter.sendMail(messageObj);
+          // transporter.close();
+
         }catch(error){
           res.status(500).json({ status: 500, error: 'Internal Server Error!' });
         }
@@ -83,7 +112,6 @@ class Users {
        
   }
 
-
 }
-const expUsers = new Users();
-export default expUsers;
+const EmpEMployee = new Employees();
+export default EmpEMployee;
