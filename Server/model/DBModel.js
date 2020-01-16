@@ -3,14 +3,14 @@ import pool from '../config/config';
 class StoreData {
 
   async createRecord(data) {
-    const text = 'INSERT INTO Employee( position, name, nationalId, phoneNumber, email, dateofBirth, status,  createdDate, modifiedDate ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) returning *';
+    const text = 'INSERT INTO Employee( position, name, nationalid, phonenumber, email, dateofbirth, status,  createdDate, modifiedDate ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) returning *';
     const values = [
       data.position,
        data.name,
-        data.nationalId,
-         data.phoneNumber,
+        data.nationalid,
+         data.phonenumber,
           data.email, 
-          data.dateofBirth, 
+          data.dateofbirth, 
           'inactive', 
           new Date(),
            'none'];
@@ -18,18 +18,34 @@ class StoreData {
     return rows;
   }
   async createEmployee(data) {
-    const text = 'INSERT INTO Employee( position, name, nationalId, phoneNumber, email,password, dateofBirth, status,  createdDate, modifiedDate ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning *';
+    const text = 'INSERT INTO Employee( position, name, nationalid, phonenumber, email,password, dateofbirth, status,  createdDate, modifiedDate ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning *';
     const values = [
        'manager',
        data.name,
-       data.nationalId,
-       data.phoneNumber,
+       data.nationalid,
+       data.phonenumber,
        data.email, 
        data.hashed,
-       data.dateofBirth, 
+       data.dateofbirth, 
        'inactive', 
        new Date(),
        'none'];
+    const { rows } = await pool.query(text, values);
+    return rows;
+  }
+  async Uploadmployee(data) {
+    const text = 'INSERT INTO Employee( position, name, nationalid, phonenumber, email,password, dateofbirth, status,  createdDate, modifiedDate ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning *';
+    const values = [
+       data.position,
+       data.name,
+       data.nationalid,
+       data.phonenumber,
+       data.email, 
+       data.hashed,
+       data.dateofbirth, 
+       data.status, 
+       new Date(),
+       data.modifiedDate];
     const { rows } = await pool.query(text, values);
     return rows;
   }
@@ -42,9 +58,9 @@ class StoreData {
 
   async updateEmployee(data, recordId) {
 
-    const { position, name, nationalId, email, phoneNumber, dateofBirth } = data;
-    const text = 'UPDATE Employee SET position = $1, name = $2, nationalId = $3, email = $4, phoneNumber = $5, dateofBirth = $6,  modifiedDate = $7 WHERE id = $8 returning*';
-    const values = [position, name, nationalId, email, phoneNumber, dateofBirth, new Date(), recordId];
+    const { position, name, nationalid, email, phonenumber, dateofbirth } = data;
+    const text = 'UPDATE Employee SET position = $1, name = $2, nationalid = $3, email = $4, phonenumber = $5, dateofbirth = $6,  modifiedDate = $7 WHERE id = $8 returning*';
+    const values = [position, name, nationalid, email, phonenumber, dateofbirth, new Date(), recordId];
     const { rows } = await pool.query(text, values);
     return rows;
   }
@@ -58,13 +74,13 @@ class StoreData {
   }
 
   async searchItem(item) {
-    const text = 'SELECT * FROM  Employee WHERE position = $1 OR email = $1 OR name = $1 OR phoneNumber = $1';
+    const text = 'SELECT * FROM  Employee WHERE position = $1 OR email = $1 OR name = $1 OR phonenumber = $1';
     const { rows } = await pool.query(text, [item]);
     return rows;
   }
   
   async fetchAllUser() {
-    const retrieveAllEmployee = 'SELECT id, category, firstname, lastname, email, phoneNumber, createdDate, modifiedDate FROM userdb';
+    const retrieveAllEmployee = 'SELECT id, category, firstname, lastname, email, phonenumber, createdDate, modifiedDate FROM userdb';
     const { rows } = await pool.query(retrieveAllEmployee);
     return rows;
   }
@@ -102,19 +118,23 @@ class StoreData {
     const { rows } = await pool.query(text, values);
     return rows;
   }
-  async checkNationalIdExist(nationalID) {
-    const IDToCheck = nationalID;
-    const text = 'SELECT * FROM Employee WHERE nationalId = $1';
+  async checknationalidExist(nationalid) {
+    const IDToCheck = nationalid;
+    const text = 'SELECT * FROM Employee WHERE nationalid = $1';
     const values = [IDToCheck];
     const { rows } = await pool.query(text, values);
     return rows;
   }
   async checkPhoneExist(phone) {
     const PhoneToCheck = phone.toString().trim().toLowerCase();
-    const text = 'SELECT * FROM Employee WHERE phoneNumber = $1';
+    const text = 'SELECT * FROM Employee WHERE phonenumber = $1';
     const values = [PhoneToCheck];
     const { rows } = await pool.query(text, values);
     return rows;
+  }
+  async UploadFile(fileToSave) {
+    const uploadedFile = await db.query('INSERT into file(filename,createdDate',[fileToSave]);
+    return uploadedFile.rows[0];
   }
 }
 const expstoreData = new StoreData();

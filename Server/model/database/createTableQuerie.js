@@ -1,16 +1,16 @@
 const EmployeeDBTable = `
 CREATE TABLE Employee(
     Id SERIAL PRIMARY KEY,
-    position VARCHAR(255) NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    nationalId VARCHAR NOT NULL,
-    phoneNumber VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    position VARCHAR(255),
+    name VARCHAR(255),
+    nationalid VARCHAR,
+    phonenumber VARCHAR(255),
+    email VARCHAR(255),
     password VARCHAR(255),
-    dateofBirth VARCHAR(255) NOT NULL,
-    status VARCHAR(255) NOT NULL,
-    createdDate VARCHAR(255) NOT NULL,
-    modifiedDate VARCHAR(255) NOT NULL
+    dateofbirth VARCHAR(255),
+    status VARCHAR(255),
+    createdDate VARCHAR(255),
+    modifiedDate VARCHAR(255)
   );`;
  
 export default { EmployeeDBTable };

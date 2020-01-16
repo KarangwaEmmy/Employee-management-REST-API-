@@ -192,6 +192,30 @@ async SeachByItem(req, res) {
   res.status(500).json({ status: 500, error: 'Internal Server Error!' });
 }
 }
+async uploadFile(req, res) {
+  const uploadedFile = req.files.file;
+  const file = [];
+
+
+  if (uploadedFile !== undefined) uploadedFile.map((i) => file.push(i.path));
+  const date = new Date();
+
+  try {
+    const uploadFile = await EmpModel.UploadFile(uploadedFile,date);
+    res.status(201).json({
+      status: 201,
+      data: [{
+        id: uploadFile.id,
+        message: 'File was uploaded Successfully',
+      }],
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      error: 'Internal Server Error!',
+    });
+  }
+}
 }
 
 const ExportEmployee = new Employee();
