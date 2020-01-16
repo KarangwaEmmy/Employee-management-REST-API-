@@ -30,6 +30,7 @@ DELETE     | `/employee/:id`        | Delete a employee
 PATCH      | `/employee/:id/activate`| Activating an employee.
 PATCH      | `/employee/:id/suspend`| Suspend an employee.
 POST        | `/employeeS/search`| Search an employee by position, name, email, phoneNumber etc.
+POST        | `/employee/upload`  | Upload an excel file, save data, return Json data and send notifocation to the employee in the document uploaded
 
 
 
